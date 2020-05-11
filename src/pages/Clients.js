@@ -81,7 +81,8 @@ export default function Clients() {
           id="Name"
           type="text"
           value={state.form.Name.value}
-          valid={state.form.Name.valid}
+          // valid={state.form.Name.valid}
+          // touched={state.form.Name.touched}
           onChange={inputChangeHandler}
           onBlur={inputBlurHandler.bind(this, 'Name')}
         />
@@ -91,6 +92,7 @@ export default function Clients() {
           type="text"
           value={state.form.LicensePlate.value}
           valid={state.form.LicensePlate.valid}
+          touched={state.form.LicensePlate.touched}
           onChange={inputChangeHandler}
           onBlur={inputBlurHandler.bind(this, 'LicensePlate')}
         />
@@ -100,6 +102,7 @@ export default function Clients() {
           type="text"
           value={state.form.Charge.value}
           valid={state.form.Charge.valid}
+          touched={state.form.Charge.touched}
           onChange={inputChangeHandler}
           onBlur={inputBlurHandler.bind(this, 'Charge')}
         />

@@ -1,4 +1,4 @@
 .touched.invalid {
-  border-color: red;
-  background: #ffc2c2;
+  border-color: rgb(255, 97, 97);
+  background: #ffeaea;
 }
