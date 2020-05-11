@@ -5,25 +5,28 @@ import Frame from '../components/Form/Frame/Frame';
 import Input from '../components/Form/Input/Input';
 import Button from '../components/Form/Button/Button';
 
-import { required } from '../util/validators';
+import { required, numeric } from '../util/validators';
 
 export default function Clients() {
   const [state, setState] = useState({
     form: {
       Name: {
         value: '',
+        valid: false,
         validators: [required],
       },
       LicensePlate: {
         value: '',
+        valid: false,
         validators: [required],
       },
       Charge: {
         value: '',
-        validators: [required],
+        valid: false,
+        validators: [required, numeric],
       },
-      formIsValid: false,
     },
+    formIsValid: false,
   });
   const inputChangeHandler = (input, value) => {
     console.log(input);
@@ -51,6 +54,24 @@ export default function Clients() {
       };
     });
   };
+
+  const inputBlurHandler = (input) => {
+    setState((prevState) => {
+      return {
+        form: {
+          ...prevState.form,
+          [input]: {
+            ...prevState.form[input],
+            touched: true,
+          },
+        },
+      };
+    });
+  };
+
+  const handleSubmit = () => {
+    console.log(state);
+  };
   return (
     <>
       <Navbar />
@@ -60,23 +81,29 @@ export default function Clients() {
           id="Name"
           type="text"
           value={state.form.Name.value}
+          valid={state.form.Name.valid}
           onChange={inputChangeHandler}
+          onBlur={inputBlurHandler.bind(this, 'Name')}
         />
         <Input
           label="License plate (use comma to separate multiple)"
           id="LicensePlate"
           type="text"
           value={state.form.LicensePlate.value}
+          valid={state.form.LicensePlate.valid}
           onChange={inputChangeHandler}
+          onBlur={inputBlurHandler.bind(this, 'LicensePlate')}
         />
         <Input
           label="Charge"
           id="Charge"
           type="text"
           value={state.form.Charge.value}
+          valid={state.form.Charge.valid}
           onChange={inputChangeHandler}
+          onBlur={inputBlurHandler.bind(this, 'Charge')}
         />
-        <Button btnName="Send" />
+        <Button btnName="Send" onClick={handleSubmit} />
       </Frame>
     </>
   );

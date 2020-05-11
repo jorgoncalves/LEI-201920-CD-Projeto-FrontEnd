@@ -3,7 +3,9 @@ import React from 'react';
 export default function Button(props) {
   return (
     <>
-      <button class="uk-button uk-button-default">{props.btnName}</button>
+      <button className="uk-button uk-button-default" onClick={props.onClick}>
+        {props.btnName}
+      </button>
     </>
   );
 }

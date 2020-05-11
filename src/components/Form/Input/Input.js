@@ -1,20 +1,27 @@
 import React from 'react';
 
+import './Input.css';
+
 export default function Input(props) {
   return (
     <>
       <div className="uk-margin">
-        <label class="uk-form-label" for={props.id}>
+        <label className="uk-form-label" htmlFor={props.id}>
           {props.label}
         </label>
         <input
+          className={[
+            !props.valid ? `invalid` : `valid`,
+            props.touched ? 'touched' : 'untouched',
+            `uk-input`,
+          ].join(' ')}
+          type={props.type}
           id={props.id}
+          value={props.value}
           onChange={(e) =>
             props.onChange(props.id, e.target.value, e.target.files)
           }
-          value={props.value}
-          className="uk-input"
-          type={props.type}
+          onBlur={props.onBlur}
         />
       </div>
     </>

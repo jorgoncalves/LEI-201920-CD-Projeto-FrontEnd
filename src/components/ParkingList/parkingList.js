@@ -12,7 +12,7 @@ export default function PendingSection(props) {
     <div className="uk-card-default">
       <div className="uk-card-body uk-card-small">
         <ul
-          class="uk-subnav uk-subnav-pill"
+          className="uk-subnav uk-subnav-pill"
           uk-switcher="animation: uk-animation-fade"
         >
           {props.parques
