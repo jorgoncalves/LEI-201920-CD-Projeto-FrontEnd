@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
+import Uikit from 'uikit';
 
 import Navbar from '../components/Navbar/Navbar';
 import Frame from '../components/Form/Frame/Frame';
@@ -6,6 +8,8 @@ import Input from '../components/Form/Input/Input';
 import Button from '../components/Form/Button/Button';
 
 import { required, numeric } from '../util/validators';
+import { socketClients } from '../util/socket-address';
+import Modal from '../components/Modal/Modal';
 
 export default function Clients() {
   const [state, setState] = useState({
@@ -26,11 +30,47 @@ export default function Clients() {
         validators: [required, numeric],
       },
     },
+    modal: {
+      title: '',
+      message: '',
+    },
     formIsValid: false,
   });
-  const inputChangeHandler = (input, value) => {
-    console.log(input);
+  const [stateReset, setStateReset] = useState(state);
+  const [socket, setSocket] = useState(io.connect(socketClients));
 
+  socket.on('connect', () => {
+    socket.emit('getAllClients');
+    socket.on('responseGetAll', (data) => {
+      console.log(data);
+    });
+  });
+
+  socket.on('response', (data) => {
+    console.log('got it ', data);
+    if (data.status === 201) {
+      setState({
+        ...stateReset,
+        modal: {
+          title: 'Success!',
+          message: 'Client was created!',
+        },
+      });
+      // setState({ ...stateReset });
+    } else {
+      setState({
+        ...state,
+        modal: {
+          title: 'Failure!',
+          message: 'Client was not created!',
+        },
+      });
+    }
+    Uikit.modal('#modalSocketResponse').show();
+    console.log(state);
+  });
+
+  const inputChangeHandler = (input, value) => {
     setState((prevState) => {
       let isValid = true;
       for (const validator of prevState.form[input].validators) {
@@ -49,6 +89,7 @@ export default function Clients() {
       //   formIsValid = formIsValid && updatedForm[inputName].valid;
       // }
       return {
+        ...state,
         form: updatedForm,
         formIsValid: formIsValid,
       };
@@ -58,6 +99,7 @@ export default function Clients() {
   const inputBlurHandler = (input) => {
     setState((prevState) => {
       return {
+        ...state,
         form: {
           ...prevState.form,
           [input]: {
@@ -70,10 +112,17 @@ export default function Clients() {
   };
 
   const handleSubmit = () => {
+    const obj = {
+      nome: state.form.Name.value,
+      matriculas: state.form.LicensePlate.value,
+      carregamento: state.form.Charge.value,
+    };
+    socket.emit('formSubmit', obj);
     console.log(state);
   };
   return (
     <>
+      <Modal title={state.modal.title} message={state.modal.message} />
       <Navbar />
       <Frame>
         <Input
