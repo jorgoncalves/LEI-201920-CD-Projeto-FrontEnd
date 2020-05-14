@@ -6,7 +6,6 @@ import LivreLbl from "../Smol/livre"
 export default function PendingSection(props) {
   const [state, setState] = useState({
     nthParq: 0,
-    parques: props.parques,
   });
   return (
     <div className="uk-card-default">
