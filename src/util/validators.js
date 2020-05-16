@@ -4,3 +4,7 @@ export const numeric = (value) =>
   /^[0-9]+(\.[0-9]{0,2})?$/.test(
     value
   );
+
+  export const selectNotEmpty = value =>{
+    
+  }

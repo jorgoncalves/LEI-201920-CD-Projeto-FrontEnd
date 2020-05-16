@@ -8,10 +8,13 @@ import Input from '../components/Form/Input/Input';
 import Button from '../components/Form/Button/Button';
 
 import { required, numeric } from '../util/validators';
-import { socketClients } from '../util/socket-address';
+import { socketClientes } from '../util/socket-address';
 import Modal from '../components/Modal/Modal';
+import Loading from '../components/Loading/Loading';
+import Header from '../components/PageHeaders/Header';
 
 export default function Clients() {
+  const [loading, setLoading] = useState(true);
   const [state, setState] = useState({
     form: {
       Name: {
@@ -37,12 +40,17 @@ export default function Clients() {
     formIsValid: false,
   });
   const [stateReset, setStateReset] = useState(state);
-  const [socket, setSocket] = useState(io.connect(socketClients));
-
-  socket.on('connect', () => {
-    socket.emit('getAllClients');
-    socket.on('responseGetAll', (data) => {
-      console.log(data);
+  const [socket, setSocket] = useState(io.connect(socketClientes));
+  useEffect(() => {
+    socket.on('connect', () => {
+      socket.emit('getAllClients');
+      socket.on('responseGetAll', (data) => {
+        const allClientes = data.data;
+        setState((prevState) => {
+          return { ...prevState, allClientes };
+        });
+        setLoading(false);
+      });
     });
   });
 
@@ -124,39 +132,44 @@ export default function Clients() {
     <>
       <Modal title={state.modal.title} message={state.modal.message} />
       <Navbar />
-      <Frame>
-        <Input
-          label="Name"
-          id="Name"
-          type="text"
-          value={state.form.Name.value}
-          // valid={state.form.Name.valid}
-          // touched={state.form.Name.touched}
-          onChange={inputChangeHandler}
-          onBlur={inputBlurHandler.bind(this, 'Name')}
-        />
-        <Input
-          label="License plate (use comma to separate multiple)"
-          id="LicensePlate"
-          type="text"
-          value={state.form.LicensePlate.value}
-          valid={state.form.LicensePlate.valid}
-          touched={state.form.LicensePlate.touched}
-          onChange={inputChangeHandler}
-          onBlur={inputBlurHandler.bind(this, 'LicensePlate')}
-        />
-        <Input
-          label="Charge"
-          id="Charge"
-          type="text"
-          value={state.form.Charge.value}
-          valid={state.form.Charge.valid}
-          touched={state.form.Charge.touched}
-          onChange={inputChangeHandler}
-          onBlur={inputBlurHandler.bind(this, 'Charge')}
-        />
-        <Button btnName="Send" onClick={handleSubmit} />
-      </Frame>
+      {loading ? (
+        <Loading />
+      ) : (
+        <Frame>
+          <Header header="Client Management"/>
+          <Input
+            label="Name"
+            id="Name"
+            type="text"
+            value={state.form.Name.value}
+            // valid={state.form.Name.valid}
+            // touched={state.form.Name.touched}
+            onChange={inputChangeHandler}
+            onBlur={inputBlurHandler.bind(this, 'Name')}
+          />
+          <Input
+            label="License plate (use comma to separate multiple)"
+            id="LicensePlate"
+            type="text"
+            value={state.form.LicensePlate.value}
+            valid={state.form.LicensePlate.valid}
+            touched={state.form.LicensePlate.touched}
+            onChange={inputChangeHandler}
+            onBlur={inputBlurHandler.bind(this, 'LicensePlate')}
+          />
+          <Input
+            label="Charge"
+            id="Charge"
+            type="text"
+            value={state.form.Charge.value}
+            valid={state.form.Charge.valid}
+            touched={state.form.Charge.touched}
+            onChange={inputChangeHandler}
+            onBlur={inputBlurHandler.bind(this, 'Charge')}
+          />
+          <Button btnName="Send" onClick={handleSubmit} />
+        </Frame>
+      )}
     </>
   );
 }

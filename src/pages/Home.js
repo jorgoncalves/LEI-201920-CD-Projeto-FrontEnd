@@ -1,101 +1,41 @@
-import React, { useState } from 'react';
-import ParkingList from '../components/ParkingList/parkingList';
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
+import ParkingList from '../components/ParkingList/ParkingList';
 
 import './Home.css';
 import Navbar from '../components/Navbar/Navbar';
 
+import { socketParques } from '../util/socket-address';
+import Loading from '../components/Loading/Loading';
+
 function Home() {
-  const [state, setState] = useState({
-    parques: [
-      {
-        nome: 'Norte Shopping',
-        precoPorHora: 0.7,
-        lugares: [
-          {
-            label: 'A1',
-            ocupado: false,
-          },
-          {
-            label: 'A2',
-            ocupado: false,
-          },
-          {
-            label: 'A3',
-            ocupado: true,
-          },
-          {
-            label: 'A4',
-            ocupado: false,
-          },
-          {
-            label: 'A5',
-            ocupado: true,
-          },
-          {
-            label: 'A6',
-            ocupado: false,
-          },
-          {
-            label: 'A2',
-            ocupado: false,
-          },
-          {
-            label: 'A3',
-            ocupado: true,
-          },
-          {
-            label: 'A4',
-            ocupado: false,
-          },
-          {
-            label: 'A5',
-            ocupado: true,
-          },
-          {
-            label: 'A6',
-            ocupado: false,
-          },
-        ],
-      },
-      {
-        nome: 'Maia Shopping',
-        precoPorHora: 0.7,
-        lugares: [
-          {
-            label: 'AA1',
-            ocupado: false,
-          },
-          {
-            label: 'AA2',
-            ocupado: true,
-          },
-          {
-            label: 'AA3',
-            ocupado: true,
-          },
-          {
-            label: 'AA4',
-            ocupado: false,
-          },
-          {
-            label: 'AA5',
-            ocupado: false,
-          },
-          {
-            label: 'AA6',
-            ocupado: true,
-          },
-        ],
-      },
-    ],
+  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState();
+  const [socket, setSocket] = useState(io.connect(socketParques));
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      socket.emit('getAllParques');
+      socket.on('responseGetAllParque', (data) => {
+        const parques = data.data;
+        setState((prevState) => {
+          return parques;
+        });
+        setLoading(false);        
+      });
+    });
   });
 
   return (
     <>
       <Navbar />
-      <div class="Container">
-        <ParkingList parques={state.parques} />
-      </div>
+      {loading ? (
+        <Loading />
+      ) : (
+        <div className="Container">
+          <ParkingList parques={state} />
+        </div>
+      )}
     </>
   );
 }

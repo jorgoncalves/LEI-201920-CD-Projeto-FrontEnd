@@ -3,10 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 
 export default function Navbar() {
   return (
-    <div>
+    <div className="">
       <nav className="uk-navbar-container uk-margin" uk-navbar="mode: click">
-        <div className="uk-navbar-left">
-          <ul className="uk-navbar-nav">
+        <div className="uk-navbar-left ">
+          <ul className="uk-navbar-nav uk-light ">
             <li className="">
               <Link
                 className={useLocation().pathname === '/' ? 'uk-active' : ''}

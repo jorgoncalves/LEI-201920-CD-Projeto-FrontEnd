@@ -1,30 +1,28 @@
 import React from 'react';
 
-import './Input.css';
+import './Select.css';
 
-export default function Input(props) {
+export default function Select(props) {
   return (
     <>
       <div className="uk-margin">
         <label className="uk-form-label" htmlFor={props.id}>
           {props.label}
         </label>
-        <input
+        <select
           className={[
             !props.valid ? `invalid` : `valid`,
             props.touched ? 'touched' : 'untouched',
-            `uk-input`,
+            'uk-select',
           ].join(' ')}
-          type={props.type}
           id={props.id}
-          disabled={props.disabled}
-          placeholder={props.placeholder}
-          value={props.value}
-          onChange={(e) =>
-            props.onChange(props.id, e.target.value, e.target.files)
-          }
+          onChange={(e) => props.onChange(props.id, e.target.value)}
           onBlur={props.onBlur}
-        />
+        >
+          {props.options.map((option, index) => {
+            return <option key={index}>{option}</option>;
+          })}
+        </select>
       </div>
     </>
   );

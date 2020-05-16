@@ -1,0 +1,9 @@
+.livre {
+  float: right;
+  color: #00F000;
+}
+
+.ocupado {
+  float: right;
+  color: #E00000;
+}
