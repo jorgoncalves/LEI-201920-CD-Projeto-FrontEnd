@@ -28,7 +28,13 @@ export default function ParkingList(props) {
                 {parque.lugares.map((lugar, index) => {
                   return (
                     <li className="childFlex" key={index}>
-                      <Lugar label={lugar.label} ocupado={lugar.ocupado} />
+                      <Lugar
+                        idParque={parque._id}
+                        nomeParque={parque.nome}
+                        idLugar={lugar._id}
+                        label={lugar.label}
+                        ocupado={lugar.ocupado}
+                      />
                     </li>
                   );
                 })}

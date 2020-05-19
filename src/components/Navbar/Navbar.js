@@ -6,44 +6,31 @@ export default function Navbar() {
     <div className="">
       <nav className="uk-navbar-container uk-margin" uk-navbar="mode: click">
         <div className="uk-navbar-left ">
-          <ul className="uk-navbar-nav uk-light ">
-            <li className="">
-              <Link
-                className={useLocation().pathname === '/' ? 'uk-active' : ''}
-                to="/"
-              >
-                Home
-              </Link>
+          <ul className="uk-navbar-nav">
+            <li className={useLocation().pathname === '/' ? 'uk-active' : ''}>
+              <Link to={{ pathname: '/', state: 'test' }}>Home</Link>
             </li>
-            <li>
-              <Link
-                className={
-                  useLocation().pathname === '/car-checkin' ? 'uk-active' : ''
-                }
-                to="/car-checkin"
-              >
-                Car Checkin
-              </Link>
+            <li
+              disabled={true}
+              className={
+                useLocation().pathname === '/car-checkin' ? 'uk-active' : ''
+              }
+            >
+              <Link to="/car-checkin">Car Checkin</Link>
             </li>
-            <li>
-              <Link
-                className={
-                  useLocation().pathname === '/car-checkout' ? 'uk-active' : ''
-                }
-                to="/car-checkout"
-              >
-                Car Checkout
-              </Link>
+            <li
+              className={
+                useLocation().pathname === '/car-checkout' ? 'uk-active' : ''
+              }
+            >
+              <Link to="/car-checkout">Car Checkout</Link>
             </li>
-            <li>
-              <Link
-                className={
-                  useLocation().pathname === '/clients' ? 'uk-active' : ''
-                }
-                to="/clients"
-              >
-                Clients
-              </Link>
+            <li
+              className={
+                useLocation().pathname === '/clients' ? 'uk-active' : ''
+              }
+            >
+              <Link to="/clients">Clients</Link>
             </li>
           </ul>
         </div>

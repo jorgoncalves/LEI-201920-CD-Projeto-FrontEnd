@@ -8,20 +8,21 @@ import Navbar from '../components/Navbar/Navbar';
 import { socketParques } from '../util/socket-address';
 import Loading from '../components/Loading/Loading';
 
-function Home() {
+function Home(props) {
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState();
-  const [socket, setSocket] = useState(io.connect(socketParques));
+  const [socket] = useState(io.connect(socketParques));
 
   useEffect(() => {
     socket.on('connect', () => {
       socket.emit('getAllParques');
       socket.on('responseGetAllParque', (data) => {
         const parques = data.data;
+        console.log(parques);
         setState((prevState) => {
           return parques;
         });
-        setLoading(false);        
+        setLoading(false);
       });
     });
   });

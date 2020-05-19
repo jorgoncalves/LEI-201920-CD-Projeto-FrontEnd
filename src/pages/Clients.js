@@ -136,7 +136,7 @@ export default function Clients() {
         <Loading />
       ) : (
         <Frame>
-          <Header header="Client Management"/>
+          <Header header="Client Management" />
           <Input
             label="Name"
             id="Name"
@@ -167,7 +167,11 @@ export default function Clients() {
             onChange={inputChangeHandler}
             onBlur={inputBlurHandler.bind(this, 'Charge')}
           />
-          <Button btnName="Send" onClick={handleSubmit} />
+          <Button
+            btnName="Send"
+            onClick={handleSubmit}
+            disabled={!state.formIsValid}
+          />
         </Frame>
       )}
     </>
