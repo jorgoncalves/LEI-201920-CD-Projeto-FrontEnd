@@ -10,7 +10,7 @@ export default function Navbar() {
             <li className={useLocation().pathname === '/' ? 'uk-active' : ''}>
               <Link to={{ pathname: '/', state: 'test' }}>Home</Link>
             </li>
-            <li
+            {/* <li
               disabled={true}
               className={
                 useLocation().pathname === '/car-checkin' ? 'uk-active' : ''
@@ -24,13 +24,18 @@ export default function Navbar() {
               }
             >
               <Link to="/car-checkout">Car Checkout</Link>
-            </li>
+            </li> */}
             <li
               className={
                 useLocation().pathname === '/clients' ? 'uk-active' : ''
               }
             >
-              <Link to="/clients">Clients</Link>
+              <Link to={{ pathname: '/clients' }}>Clients</Link>
+            </li>
+            <li
+              className={useLocation().pathname === '/parks' ? 'uk-active' : ''}
+            >
+              <Link to={{ pathname: '/parks' }}>Parks</Link>
             </li>
           </ul>
         </div>

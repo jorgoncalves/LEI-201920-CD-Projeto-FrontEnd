@@ -1,9 +1,9 @@
 .livre {
-  float: right;
+  /* float: right; */
   color: #00F000;
 }
 
 .ocupado {
-  float: right;
+  /* float: right; */
   color: #E00000;
 }

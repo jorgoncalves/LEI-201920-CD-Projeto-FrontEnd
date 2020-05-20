@@ -15,6 +15,7 @@ import Button from '../components/Form/Button/Button';
 import Header from '../components/PageHeaders/Header';
 import Modal from '../components/Modal/Modal';
 import Select from '../components/Form/Select/Select';
+import { socketConnectRegistos } from '../util/sockets';
 
 export default function CarCheckout(props) {
   let history = useHistory();
@@ -87,10 +88,11 @@ export default function CarCheckout(props) {
         console.log(prevState);
 
         const updatedForm = { ...prevState.form };
-
+        console.log(props.location);
         const findResult = prevState.allRegistos.find(
           (registo) =>
-            registo.parque._id === props.location.state.parque.idParque
+            registo.parque._id === props.location.state.parque.idParque &&
+            registo.lugar._id === props.location.state.lugar.idLugar
         );
 
         if (findResult) {
@@ -126,25 +128,34 @@ export default function CarCheckout(props) {
     socket.on('response', (data) => {
       console.log('got it ', data);
       if (data.status === 201) {
-        setState({
-          ...stateReset,
-          modal: {
-            title: 'Success!',
-            message: 'Car has been checked out!',
-          },
-        });
+        // setState({
+        //   ...stateReset,
+        //   modal: {
+        //     title: 'Success!',
+        //     message: 'Car has been checked out!',
+        //   },
+        // });
         // setState({ ...stateReset });
-      } else {
-        setState({
-          ...state,
-          modal: {
-            title: 'Failure!',
-            message: `Car hasn't been checked out!`,
-          },
+        socketConnectRegistos.close();
+        Uikit.modal.alert('Car has been checked out!').then(function () {
+          history.push('/');
         });
+        // Uikit.modal('#modalSocketResponse').show();
+      } else {
+        socketConnectRegistos.close();
+        Uikit.modal.alert(`Car hasn't been checked out!`).then(function () {
+          history.push('/');
+        });
+        // setState({
+        //   ...state,
+        //   modal: {
+        //     title: 'Failure!',
+        //     message: `Car hasn't been checked out!`,
+        //   },
+        // });
       }
-      Uikit.modal('#modalSocketResponse').show();
-      console.log(state);
+      // Uikit.modal('#modalSocketResponse').show();
+      // console.log(state);
     });
   }, []);
 

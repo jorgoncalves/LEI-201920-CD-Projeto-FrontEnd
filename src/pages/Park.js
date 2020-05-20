@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import Uikit from 'uikit';
 
 import Navbar from '../components/Navbar/Navbar';
@@ -7,11 +8,12 @@ import Input from '../components/Form/Input/Input';
 import Button from '../components/Form/Button/Button';
 
 import { required, numeric } from '../util/validators';
-import { socketConnectClientes } from '../util/sockets';
+import { socketConnectParques } from '../util/sockets';
 import Loading from '../components/Loading/Loading';
 import Header from '../components/PageHeaders/Header';
 
-export default function Clients() {
+export default function Parks() {
+  let history = useHistory();
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState({
     form: {
@@ -20,12 +22,12 @@ export default function Clients() {
         valid: false,
         validators: [required],
       },
-      LicensePlate: {
+      Price: {
         value: '',
         valid: false,
-        validators: [required],
+        validators: [required, numeric],
       },
-      Charge: {
+      NumOfSpaces: {
         value: '',
         valid: false,
         validators: [required, numeric],
@@ -39,22 +41,24 @@ export default function Clients() {
   });
   const [stateReset, setStateReset] = useState(state);
   const getInitialData = () => {
-    socketConnectClientes.emit('getAllClients');
-    socketConnectClientes.off('responseGetAll').on('responseGetAll', (data) => {
-      const allClientes = data.data;
-      setState((prevState) => {
-        return { ...prevState, allClientes };
+    socketConnectParques.emit('getAllParques');
+    socketConnectParques
+      .off('responseGetAllParque')
+      .on('responseGetAllParque', (data) => {
+        const allClientes = data.data;
+        setState((prevState) => {
+          return { ...prevState, allClientes };
+        });
+        setLoading(false);
       });
-      setLoading(false);
-    });
   };
 
   const handleSubmitResponse = () => {
-    socketConnectClientes.off('response').on('response', (data) => {
+    socketConnectParques.off('respCreateParque').on('respCreateParque', (data) => {
       console.log('got it ', data);
       if (data.status === 201) {
-        Uikit.modal.alert(`Client was created!`).then(function () {
-          // history.push('/');
+        Uikit.modal.alert(`Park was created!`).then(function () {
+          history.push('/');
         });
         // setState({
         //   ...stateReset,
@@ -65,9 +69,8 @@ export default function Clients() {
         // });
         // setState({ ...stateReset });
       } else {
-        socketConnectClientes.close();
-        Uikit.modal.alert(`Client was not created!`).then(function () {
-          // history.push('/');
+        Uikit.modal.alert(`Park was not created!`).then(function () {
+          history.push('/');
         });
         // setState({
         //   ...state,
@@ -77,8 +80,6 @@ export default function Clients() {
         //   },
         // });
       }
-      Uikit.modal('#modalSocketResponse').show();
-      console.log(state);
     });
   };
 
@@ -97,9 +98,9 @@ export default function Clients() {
         },
       };
       let formIsValid = true;
-      for (const inputName in updatedForm) {
-        formIsValid = formIsValid && updatedForm[inputName].valid;
-      }
+      // for (const inputName in updatedForm) {
+      //   formIsValid = formIsValid && updatedForm[inputName].valid;
+      // }
       return {
         ...state,
         form: updatedForm,
@@ -126,62 +127,61 @@ export default function Clients() {
   const handleSubmit = () => {
     const obj = {
       nome: state.form.Name.value,
-      matriculas: state.form.LicensePlate.value,
-      carregamento: state.form.Charge.value,
+      precoPorHora: state.form.Price.value,
+      numLugares: state.form.NumOfSpaces.value,
     };
-    socketConnectClientes.emit('formSubmit', obj);
+    socketConnectParques.emit('formSubmit', obj);
     console.log(state);
   };
   useEffect(() => {
     let isMounted = true;
     if (isMounted) {
-      socketConnectClientes.open();
+      socketConnectParques.open();
       getInitialData();
       handleSubmitResponse();
     }
     return () => {
-      socketConnectClientes.close();
+      socketConnectParques.close();
       isMounted = false;
     };
   }, []);
   return (
     <>
-      {/* <Modal title={state.modal.title} message={state.modal.message} /> */}
       <Navbar />
       {loading ? (
         <Loading />
       ) : (
         <Frame>
-          <Header header="Client Management" />
+          <Header header="Park Management" />
           <Input
-            label="Name"
+            label="Park Name"
             id="Name"
             type="text"
             value={state.form.Name.value}
-            // valid={state.form.Name.valid}
-            // touched={state.form.Name.touched}
+            valid={state.form.Name.valid}
+            touched={state.form.Name.touched}
             onChange={inputChangeHandler}
             onBlur={inputBlurHandler.bind(this, 'Name')}
           />
           <Input
-            label="License plate (use comma to separate multiple)"
-            id="LicensePlate"
-            type="text"
-            value={state.form.LicensePlate.value}
-            valid={state.form.LicensePlate.valid}
-            touched={state.form.LicensePlate.touched}
+            label="Price by hour"
+            id="Price"
+            type="number"
+            value={state.form.Price.value}
+            valid={state.form.Price.valid}
+            touched={state.form.Price.touched}
             onChange={inputChangeHandler}
-            onBlur={inputBlurHandler.bind(this, 'LicensePlate')}
+            onBlur={inputBlurHandler.bind(this, 'Price')}
           />
           <Input
-            label="Charge"
-            id="Charge"
-            type="text"
-            value={state.form.Charge.value}
-            valid={state.form.Charge.valid}
-            touched={state.form.Charge.touched}
+            label="Number of parking spaces"
+            id="NumOfSpaces"
+            type="number"
+            value={state.form.NumOfSpaces.value}
+            valid={state.form.NumOfSpaces.valid}
+            touched={state.form.NumOfSpaces.touched}
             onChange={inputChangeHandler}
-            onBlur={inputBlurHandler.bind(this, 'Charge')}
+            onBlur={inputBlurHandler.bind(this, 'NumOfSpaces')}
           />
           <Button
             btnName="Send"

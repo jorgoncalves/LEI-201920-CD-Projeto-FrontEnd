@@ -8,7 +8,7 @@ export default function Lugar(props) {
   return (
     <>
       <span>
-        <b>{props.label}</b>
+        <b>{props.label} - </b>
         {!props.ocupado ? (
           <Link
             to={{
@@ -19,7 +19,7 @@ export default function Lugar(props) {
               },
             }}
           >
-            <b className="livre">Livre</b>{' '}
+            <b className="livre">Free</b>{' '}
           </Link>
         ) : (
           <Link
@@ -31,7 +31,7 @@ export default function Lugar(props) {
               },
             }}
           >
-            <b className="ocupado">Ocupado</b>
+            <b className="ocupado">Occupied</b>
           </Link>
         )}
       </span>

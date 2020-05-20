@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 import Uikit from 'uikit';
 
 import { required } from '../util/validators';
-import { socketRegistos } from '../util/socket-address';
+// import { socketRegistos } from '../util/socket-address';
+import { socketConnectRegistos } from '../util/sockets';
 
 import Navbar from '../components/Navbar/Navbar';
 import Loading from '../components/Loading/Loading';
@@ -17,11 +18,6 @@ import InputIcon from '../components/Form/Input/InputIcon';
 
 export default function CarCheckin(props) {
   let history = useHistory();
-  useEffect(() => {
-    if (props.location.state === undefined) {
-      history.push('/');
-    }
-  }, []);
   const [state, setState] = useState({
     form: {
       Client: {
@@ -54,82 +50,61 @@ export default function CarCheckin(props) {
   });
   const [stateReset] = useState(state);
   const [loading, setLoading] = useState(true);
-  const socket = io(socketRegistos);
-  useEffect(() => {
-    setState((prevState) => {
-      return {
-        ...prevState,
-        form: {
-          ...prevState.form,
-          Park: {
-            ...prevState.Park,
-            _id: props.location.state.parque.idParque,
-            value: props.location.state.parque.nome,
-            valid: true,
-          },
-          Place: {
-            ...prevState.Place,
-            _id: props.location.state.lugar.idLugar,
-            value: props.location.state.lugar.label,
-            valid: true,
-          },
-        },
-      };
-    });
-  }, []);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    // Apenas registos em que saida == null
-    socket.on('responseGetAllRegistos', (data) => {
-      const allRegistos = data.data;
-      console.log(allRegistos);
-
-      if (isMounted) {
+  const getInitialData = () => {
+    socketConnectRegistos.emit('getAllRegistos');
+    socketConnectRegistos
+      .off('responseGetAllRegistos')
+      .on('responseGetAllRegistos', (data) => {
+        const allRegistos = data.data;
+        console.log(allRegistos);
         setState((prevState) => {
           return { ...prevState, allRegistos };
         });
-        setLoading(false);
-      }
-    });
+      });
+    setLoading(false);
+  };
 
-    return () => (isMounted = false);
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    socket.on('responseNewRegistos', (data) => {
-      console.log('got it ', data);
-      if (data.status === 201) {
-        if (isMounted) {
-          setState((prevState) => {
-            return {
-              ...stateReset,
-              modal: {
-                title: 'Success!',
-                message: 'Car has been registered!',
-              },
-            };
+  const handleSubmitResponse = () => {
+    socketConnectRegistos
+      .off('responseNewRegistos')
+      .on('responseNewRegistos', (data) => {
+        console.log('got it ', data);
+        if (data.status === 201) {
+          socketConnectRegistos.close();
+          Uikit.modal.alert('Car has been registered!').then(function () {
+            history.push('/');
           });
-        }
-      } else {
-        if (isMounted) {
-          setState({
-            ...state,
-            modal: {
-              title: 'Failure!',
-              message: `Car hasn't been registered!`,
-            },
+          // setState((prevState) => {
+          //   return {
+          //     ...stateReset,
+          //     modal: {
+          //       title: 'Success!',
+          //       message: 'Car has been registered!',
+          //     },
+          //   };
+          // });
+        } else {
+          socketConnectRegistos.close();
+          Uikit.modal.alert(`Car hasn't been registered!`).then(function () {
+            history.push('/');
           });
+          // setState({
+          //   ...state,
+          //   modal: {
+          //     title: 'Failure!',
+          //     message: `Car hasn't been registered!`,
+          //   },
+          // });
         }
-      }
-      Uikit.modal('#modalSocketResponse').show();
-    });
-
-    return () => (isMounted = false);
-  }, []);
+        // Uikit.modal('#modalSocketResponse')
+        //   .show()
+        //   .then(() => {
+        //     socketConnectRegistos.close();
+        //     // history.push('/');
+        //   });
+      });
+  };
 
   const generateLicensePlate = () => {
     const abc = 'ABCDEFGHIJKLMNOPQRSTUVXZ';
@@ -208,9 +183,49 @@ export default function CarCheckin(props) {
       idParque: state.form.Park._id,
       idLugar: state.form.Place._id,
     };
-    socket.emit('createNewRegisto', obj);
+    socketConnectRegistos.emit('createNewRegisto', obj);
     console.log(obj);
   };
+  useEffect(() => {
+    let isMounted = true;
+    if (isMounted) {
+      if (props.location.state === undefined) {
+        history.push('/');
+      }
+      console.log(props.location);
+      
+      setState((prevState) => {
+        return {
+          ...prevState,
+          form: {
+            ...prevState.form,
+            Park: {
+              ...prevState.Park,
+              _id: props.location.state.parque.idParque,
+              value: props.location.state.parque.nome,
+              valid: true,
+            },
+            Place: {
+              ...prevState.Place,
+              _id: props.location.state.lugar.idLugar,
+              value: props.location.state.lugar.label,
+              valid: true,
+            },
+          },
+        };
+      });
+      // Apenas registos em que saida == null
+      socketConnectRegistos.open();
+      getInitialData();
+      handleSubmitResponse();
+    }
+    return () => {
+      isMounted = false;
+      socketConnectRegistos.off('responseGetAllRegistos');
+      socketConnectRegistos.off('responseNewRegistos');
+      socketConnectRegistos.close();
+    };
+  }, []);
 
   return (
     <>
@@ -222,7 +237,7 @@ export default function CarCheckin(props) {
         <Frame>
           <Header header="Car checkin" />
           <Input
-            label="Client (optional)"
+            label="Client (optional/ not working)"
             id="Client"
             type="text"
             placeholder="Type the Client name"

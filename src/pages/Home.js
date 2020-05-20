@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 import ParkingList from '../components/ParkingList/ParkingList';
 
 import './Home.css';
 import Navbar from '../components/Navbar/Navbar';
-
-import { socketParques } from '../util/socket-address';
+import Header from '../components/PageHeaders/Header';
+// import { socketParques } from '../util/socket-address';
 import Loading from '../components/Loading/Loading';
 
-function Home(props) {
+import { socketConnectParques } from '../util/sockets';
+import Frame from '../components/Form/Frame/Frame';
+
+
+export default function Home(props) {
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState();
-  const [socket] = useState(io.connect(socketParques));
+  // const [socket] = useState(io.connect(socketParques));
 
-  useEffect(() => {
-    socket.on('connect', () => {
-      socket.emit('getAllParques');
-      socket.on('responseGetAllParque', (data) => {
+  const getInitialData = () => {
+    socketConnectParques.emit('getAllParques');
+    socketConnectParques
+      .off('responseGetAllParque')
+      .on('responseGetAllParque', (data) => {
         const parques = data.data;
         console.log(parques);
         setState((prevState) => {
@@ -24,8 +29,19 @@ function Home(props) {
         });
         setLoading(false);
       });
-    });
-  });
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    if (isMounted) {
+      socketConnectParques.open();
+      getInitialData();
+    }
+    return () => {
+      socketConnectParques.close();
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <>
@@ -33,12 +49,11 @@ function Home(props) {
       {loading ? (
         <Loading />
       ) : (
-        <div className="Container">
-          <ParkingList parques={state} />
-        </div>
+        <Frame fullWidth={true}>
+            <Header header="Select one parking space" />
+            <ParkingList parques={state} />
+        </Frame>
       )}
     </>
   );
 }
-
-export default Home;
