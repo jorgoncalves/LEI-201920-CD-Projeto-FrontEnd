@@ -8,6 +8,7 @@
     1.  possa ver os lugares livres do parque que pretende;
     2.  possa dar check in e check out ao Client;
     3.  possa criar "Clintes Habituais", os quais terão um identificador próprio, associado às suas matriculas e possa "carregar o seu saldo" para poder sair e entrar do parque mais facilmente
+    4.  possa gerar parques novos
 
 **2. Plano de desenvolvimento da aplicação**
 
