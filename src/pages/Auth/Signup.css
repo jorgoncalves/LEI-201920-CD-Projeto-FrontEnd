@@ -1,0 +1,16 @@
+body{
+    background-color: #ccc;
+    width: 100vw;
+    height: 100vh;
+}
+#root{
+    width: 100vw;
+    height: 100vh;
+}
+.Container{
+    width: calc(100% - 2rem);
+    height: 75vh;
+    display: block;
+    padding: 1rem;
+    overflow: auto;
+}

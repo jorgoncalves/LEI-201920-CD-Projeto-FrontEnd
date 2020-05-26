@@ -4,18 +4,18 @@ import io from 'socket.io-client';
 import Uikit from 'uikit';
 import moment from 'moment';
 
-import { required } from '../util/validators';
-import { socketRegistos } from '../util/socket-address';
+import { required } from '../../util/validators';
+import { socketRegistos } from '../../util/socket-address';
 
-import Navbar from '../components/Navbar/Navbar';
-import Loading from '../components/Loading/Loading';
-import Frame from '../components/Form/Frame/Frame';
-import Input from '../components/Form/Input/Input';
-import Button from '../components/Form/Button/Button';
-import Header from '../components/PageHeaders/Header';
-import Modal from '../components/Modal/Modal';
-import Select from '../components/Form/Select/Select';
-import { socketConnectRegistos } from '../util/sockets';
+import Navbar from '../../components/Navbar/Navbar';
+import Loading from '../../components/Loading/Loading';
+import Frame from '../../components/Form/Frame/Frame';
+import Input from '../../components/Form/Input/Input';
+import Button from '../../components/Form/Button/Button';
+import Header from '../../components/PageHeaders/Header';
+import Modal from '../../components/Modal/Modal';
+import Select from '../../components/Form/Select/Select';
+import { socketConnectRegistos } from '../../util/sockets';
 
 export default function CarCheckout(props) {
   let history = useHistory();
@@ -28,6 +28,7 @@ export default function CarCheckout(props) {
     form: {
       Register: {
         _id: '',
+        idCliente: '',
         valid: true,
       },
       LicensePlate: {
@@ -71,71 +72,57 @@ export default function CarCheckout(props) {
 
   useEffect(() => {
     socket.on('connect', () => {
-      socket.emit('getAllRegistos');
-      // Apenas registos em que saida == null
-      socket.on('responseGetAllRegistos', (data) => {
-        const allRegistos = data.data;
-        setState((prevState) => {
-          return { ...prevState, allRegistos };
-        });
-        setLoading(false);
+      socket.emit('getRegisto', {
+        parque: { _id: props.location.state.parque.idParque },
+        lugar: { _id: props.location.state.lugar.idLugar },
       });
-    });
-  }, []);
-  useEffect(() => {
-    if (!loading)
-      setState((prevState) => {
-        console.log(prevState);
+      // Apenas registos em que saida == null
+      socket.on('responseGetRegisto', (data) => {
+        console.log(data);
+        const registerData = data.data;
+        setState((prevState) => {
+          console.log(prevState);
 
-        const updatedForm = { ...prevState.form };
-        console.log(props.location);
-        const findResult = prevState.allRegistos.find(
-          (registo) =>
-            registo.parque._id === props.location.state.parque.idParque &&
-            registo.lugar._id === props.location.state.lugar.idLugar
-        );
+          const updatedForm = { ...prevState.form };
+          console.log(props.location);
 
-        if (findResult) {
-          const hora_entrada = moment(findResult.hora_entrada);
+          const hora_entrada = moment(registerData.hora_entrada);
           const hora_saida = moment();
 
           const valor =
             moment.duration(hora_saida.diff(hora_entrada)).hours() === 0
-              ? findResult.parque.precoPorHora
+              ? registerData.parque.precoPorHora
               : moment.duration(hora_saida.diff(hora_entrada)).hours() *
-                findResult.parque.precoPorHora;
-          console.log(findResult);
-          updatedForm.Register._id = findResult._id;
-          updatedForm.LicensePlate.value = findResult.matricula;
+                registerData.parque.precoPorHora;
+          console.log(registerData);
+          updatedForm.Register._id = registerData._id;
+          updatedForm.Register.idCliente =
+            registerData.cliente != null ? registerData.cliente : '';
+          updatedForm.LicensePlate.value = registerData.matricula;
           updatedForm.LicensePlate.valid = true;
-          updatedForm.Park._id = findResult.parque._id;
-          updatedForm.Park.value = findResult.parque.nome;
+          updatedForm.Park._id = registerData.parque._id;
+          updatedForm.Park.value = registerData.parque.nome;
           updatedForm.Park.valid = true;
-          updatedForm.Place._id = findResult.lugar._id;
-          updatedForm.Place.value = findResult.lugar.label;
+          updatedForm.Place._id = registerData.lugar._id;
+          updatedForm.Place.value = registerData.lugar.label;
           updatedForm.Place.valid = true;
-          updatedForm.TotalPrice.value = valor;
+          updatedForm.TotalPrice.value = `${valor.toFixed(2)}`;
           updatedForm.TotalPrice.valid = true;
-        }
-        return {
-          ...state,
-          form: updatedForm,
-        };
+          return {
+            ...prevState,
+            form: updatedForm,
+            registerData,
+          };
+        });
       });
-  }, [loading]);
+      setLoading(false);
+    });
+  }, []);
 
   useEffect(() => {
     socket.on('response', (data) => {
       console.log('got it ', data);
       if (data.status === 201) {
-        // setState({
-        //   ...stateReset,
-        //   modal: {
-        //     title: 'Success!',
-        //     message: 'Car has been checked out!',
-        //   },
-        // });
-        // setState({ ...stateReset });
         socketConnectRegistos.close();
         Uikit.modal.alert('Car has been checked out!').then(function () {
           history.push('/');
@@ -146,16 +133,7 @@ export default function CarCheckout(props) {
         Uikit.modal.alert(`Car hasn't been checked out!`).then(function () {
           history.push('/');
         });
-        // setState({
-        //   ...state,
-        //   modal: {
-        //     title: 'Failure!',
-        //     message: `Car hasn't been checked out!`,
-        //   },
-        // });
       }
-      // Uikit.modal('#modalSocketResponse').show();
-      // console.log(state);
     });
   }, []);
 
@@ -236,7 +214,10 @@ export default function CarCheckout(props) {
   const handleSubmit = () => {
     const obj = {
       idRegisto: state.form.Register._id,
-      idCliente: '',
+      idCliente:
+        state.form.Register.idCliente !== ''
+          ? state.form.Register.idCliente
+          : null,
       matricula: state.form.LicensePlate.value,
       idParque: state.form.Park._id,
       idLugar: state.form.Place._id,
@@ -250,7 +231,7 @@ export default function CarCheckout(props) {
   return (
     <>
       <Modal title={state.modal.title} message={state.modal.message} />
-      <Navbar />
+      <Navbar onLogout={props.onLogout} isAdmin={props.isAdmin} />
       {loading ? (
         <Loading />
       ) : (
@@ -294,6 +275,7 @@ export default function CarCheckout(props) {
             id="PaymentMethod"
             valid={state.form.PaymentMethod.valid}
             touched={state.form.PaymentMethod.touched}
+            isClient={state.form.Register.idCliente !== '' ? true : false}
             onChange={inputChangeHandler}
             onBlur={inputBlurHandler.bind(this, 'PaymentMethod')}
             options={['', 'Money', 'Card']}
@@ -303,7 +285,7 @@ export default function CarCheckout(props) {
             id="TotalPrice"
             type="text"
             disabled={true}
-            value={state.form.TotalPrice.value}
+            value={`${state.form.TotalPrice.value}€`}
             valid={state.form.TotalPrice.valid}
             touched={state.form.TotalPrice.touched}
             onChange={inputChangeHandler}

@@ -12,7 +12,7 @@ import { socketConnectParques } from '../util/sockets';
 import Loading from '../components/Loading/Loading';
 import Header from '../components/PageHeaders/Header';
 
-export default function Parks() {
+export default function Parks(props) {
   let history = useHistory();
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState({
@@ -31,6 +31,11 @@ export default function Parks() {
         value: '',
         valid: false,
         validators: [required, numeric],
+      },
+      NumOfHandicape: {
+        value: '',
+        valid: true,
+        validators: [numeric],
       },
     },
     modal: {
@@ -54,33 +59,20 @@ export default function Parks() {
   };
 
   const handleSubmitResponse = () => {
-    socketConnectParques.off('respCreateParque').on('respCreateParque', (data) => {
-      console.log('got it ', data);
-      if (data.status === 201) {
-        Uikit.modal.alert(`Park was created!`).then(function () {
-          history.push('/');
-        });
-        // setState({
-        //   ...stateReset,
-        //   modal: {
-        //     title: 'Success!',
-        //     message: 'Client was created!',
-        //   },
-        // });
-        // setState({ ...stateReset });
-      } else {
-        Uikit.modal.alert(`Park was not created!`).then(function () {
-          history.push('/');
-        });
-        // setState({
-        //   ...state,
-        //   modal: {
-        //     title: 'Failure!',
-        //     message: 'Client was not created!',
-        //   },
-        // });
-      }
-    });
+    socketConnectParques
+      .off('respCreateParque')
+      .on('respCreateParque', (data) => {
+        console.log('got it ', data);
+        if (data.status === 201) {
+          Uikit.modal.alert(`Park was created!`).then(function () {
+            history.push('/');
+          });
+        } else {
+          Uikit.modal.alert(`Park was not created!`).then(function () {
+            history.push('/');
+          });
+        }
+      });
   };
 
   const inputChangeHandler = (input, value) => {
@@ -98,9 +90,9 @@ export default function Parks() {
         },
       };
       let formIsValid = true;
-      // for (const inputName in updatedForm) {
-      //   formIsValid = formIsValid && updatedForm[inputName].valid;
-      // }
+      for (const inputName in updatedForm) {
+        formIsValid = formIsValid && updatedForm[inputName].valid;
+      }
       return {
         ...state,
         form: updatedForm,
@@ -129,6 +121,7 @@ export default function Parks() {
       nome: state.form.Name.value,
       precoPorHora: state.form.Price.value,
       numLugares: state.form.NumOfSpaces.value,
+      numMobilidadeReduzida: state.form.NumOfHandicape.value,
     };
     socketConnectParques.emit('formSubmit', obj);
     console.log(state);
@@ -147,7 +140,7 @@ export default function Parks() {
   }, []);
   return (
     <>
-      <Navbar />
+      <Navbar onLogout={props.onLogout} isAdmin={props.isAdmin}/>
       {loading ? (
         <Loading />
       ) : (
@@ -182,6 +175,16 @@ export default function Parks() {
             touched={state.form.NumOfSpaces.touched}
             onChange={inputChangeHandler}
             onBlur={inputBlurHandler.bind(this, 'NumOfSpaces')}
+          />
+          <Input
+            label="Number of handicape spaces (inclusive)"
+            id="NumOfHandicape"
+            type="number"
+            value={state.form.NumOfHandicape.value}
+            valid={state.form.NumOfHandicape.valid}
+            touched={state.form.NumOfHandicape.touched}
+            onChange={inputChangeHandler}
+            onBlur={inputBlurHandler.bind(this, 'NumOfHandicape')}
           />
           <Button
             btnName="Send"

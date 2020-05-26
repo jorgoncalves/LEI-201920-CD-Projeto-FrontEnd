@@ -1,3 +1,25 @@
+.lugarContainer {
+  padding: 20px !important;
+  width: 200px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  /* align-items: center; */
+}
+
+.lugarState {
+  margin: 5px auto;
+}
+
+.iconMobilidadeReduzida {
+  text-align: end;
+}
+
+.iconMobilidadeReduzida img {
+  width: 15px;
+}
+
 .livre {
   /* float: right; */
   color: #00F000;

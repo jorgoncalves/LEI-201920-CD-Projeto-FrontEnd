@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import Uikit from 'uikit';
 
-import Navbar from '../components/Navbar/Navbar';
-import Frame from '../components/Form/Frame/Frame';
-import Input from '../components/Form/Input/Input';
-import Button from '../components/Form/Button/Button';
+import Navbar from '../../components/Navbar/Navbar';
+import Frame from '../../components/Form/Frame/Frame';
+import Input from '../../components/Form/Input/Input';
+import Button from '../../components/Form/Button/Button';
 
-import { required, numeric } from '../util/validators';
-import { socketConnectClientes } from '../util/sockets';
-import Loading from '../components/Loading/Loading';
-import Header from '../components/PageHeaders/Header';
+import { required, numeric } from '../../util/validators';
+import { socketConnectClientes } from '../../util/sockets';
+import Loading from '../../components/Loading/Loading';
+import Header from '../../components/PageHeaders/Header';
 
-export default function Clients() {
+export default function Clients(props) {
+  const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState({
     form: {
@@ -31,53 +33,45 @@ export default function Clients() {
         validators: [required, numeric],
       },
     },
-    modal: {
-      title: '',
-      message: '',
-    },
+
     formIsValid: false,
   });
   const [stateReset, setStateReset] = useState(state);
   const getInitialData = () => {
-    socketConnectClientes.emit('getAllClients');
-    socketConnectClientes.off('responseGetAll').on('responseGetAll', (data) => {
-      const allClientes = data.data;
-      setState((prevState) => {
-        return { ...prevState, allClientes };
+    socketConnectClientes.emit('getCliente', { _id: props.userClientId });
+    socketConnectClientes
+      .off('responseCliente')
+      .on('responseCliente', (data) => {
+        console.log(data);
+        const clientData = data.data;
+        setState((prevState) => {
+          const updatedForm = prevState.form;
+          updatedForm.Name.value = clientData.nome;
+          updatedForm.Name.valid = true;
+          updatedForm.LicensePlate.value = clientData.matriculas;
+          updatedForm.LicensePlate.valid = true;
+          updatedForm.Charge.value = `${clientData.saldoEmCartao.toFixed(2).toString()}€`;
+          updatedForm.Charge.valid = true;
+          return { ...prevState, form: updatedForm };
+        });
+        setLoading(false);
       });
-      setLoading(false);
-    });
   };
 
   const handleSubmitResponse = () => {
-    socketConnectClientes.off('response').on('response', (data) => {
+    socketConnectClientes.off('responseUpdate').on('responseUpdate', (data) => {
       console.log('got it ', data);
-      if (data.status === 201) {
-        Uikit.modal.alert(`Client was created!`).then(function () {
-          // history.push('/');
+      if (data.status === 200) {
+        Uikit.modal.alert(`Client was updated!`).then(function () {
+          history.push('/');
         });
-        // setState({
-        //   ...stateReset,
-        //   modal: {
-        //     title: 'Success!',
-        //     message: 'Client was created!',
-        //   },
-        // });
-        // setState({ ...stateReset });
       } else {
         socketConnectClientes.close();
-        Uikit.modal.alert(`Client was not created!`).then(function () {
-          // history.push('/');
+        Uikit.modal.alert(`Client was not updated!`).then(function () {
+          history.push('/');
         });
-        // setState({
-        //   ...state,
-        //   modal: {
-        //     title: 'Failure!',
-        //     message: 'Client was not created!',
-        //   },
-        // });
       }
-      Uikit.modal('#modalSocketResponse').show();
+      // Uikit.modal('#modalSocketResponse').show();
       console.log(state);
     });
   };
@@ -124,12 +118,17 @@ export default function Clients() {
   };
 
   const handleSubmit = () => {
+    let matriculas = state.form.LicensePlate.value;
+    if (matriculas.includes(',')) {
+      matriculas = matriculas.split(',');
+    }
     const obj = {
+      _id: props.userClientId,
       nome: state.form.Name.value,
-      matriculas: state.form.LicensePlate.value,
+      matriculas: matriculas,
       carregamento: state.form.Charge.value,
     };
-    socketConnectClientes.emit('formSubmit', obj);
+    socketConnectClientes.emit('updateCliente', obj);
     console.log(state);
   };
   useEffect(() => {
@@ -147,7 +146,7 @@ export default function Clients() {
   return (
     <>
       {/* <Modal title={state.modal.title} message={state.modal.message} /> */}
-      <Navbar />
+      <Navbar onLogout={props.onLogout} isAdmin={props.isAdmin} />
       {loading ? (
         <Loading />
       ) : (
@@ -177,6 +176,8 @@ export default function Clients() {
             label="Charge"
             id="Charge"
             type="text"
+            min="0"
+            disabled={true}
             value={state.form.Charge.value}
             valid={state.form.Charge.valid}
             touched={state.form.Charge.touched}
@@ -184,7 +185,7 @@ export default function Clients() {
             onBlur={inputBlurHandler.bind(this, 'Charge')}
           />
           <Button
-            btnName="Send"
+            btnName="Update"
             onClick={handleSubmit}
             disabled={!state.formIsValid}
           />

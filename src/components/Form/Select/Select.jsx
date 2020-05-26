@@ -20,7 +20,14 @@ export default function Select(props) {
           onBlur={props.onBlur}
         >
           {props.options.map((option, index) => {
-            return <option key={index}>{option}</option>;
+            return (
+              <option
+                key={index}
+                disabled={!props.isClient && option === 'Card'}
+              >
+                {option}
+              </option>
+            );
           })}
         </select>
       </div>

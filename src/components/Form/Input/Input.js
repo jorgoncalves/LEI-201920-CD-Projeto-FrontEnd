@@ -17,6 +17,7 @@ export default function Input(props) {
           ].join(' ')}
           type={props.type}
           id={props.id}
+          min={props.min}
           disabled={props.disabled}
           placeholder={props.placeholder}
           value={props.value}

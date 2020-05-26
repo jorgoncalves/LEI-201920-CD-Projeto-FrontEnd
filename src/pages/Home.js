@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
-// import io from 'socket.io-client';
 import ParkingList from '../components/ParkingList/ParkingList';
 
 import './Home.css';
 import Navbar from '../components/Navbar/Navbar';
 import Header from '../components/PageHeaders/Header';
-// import { socketParques } from '../util/socket-address';
 import Loading from '../components/Loading/Loading';
 
 import { socketConnectParques } from '../util/sockets';
 import Frame from '../components/Form/Frame/Frame';
 
-
 export default function Home(props) {
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState();
-  // const [socket] = useState(io.connect(socketParques));
+  const [isAdmin, setIsAdmin] = useState(props.isAdmin);
 
   const getInitialData = () => {
     socketConnectParques.emit('getAllParques');
@@ -42,16 +39,18 @@ export default function Home(props) {
       isMounted = false;
     };
   }, []);
-
+  useEffect(() => {
+    setIsAdmin(props.isAdmin);
+  }, [props.isAdmin]);
   return (
     <>
-      <Navbar />
+      <Navbar onLogout={props.onLogout} isAdmin={isAdmin} />
       {loading ? (
         <Loading />
       ) : (
         <Frame fullWidth={true}>
-            <Header header="Select one parking space" />
-            <ParkingList parques={state} />
+          <Header header="Select one parking space" />
+          <ParkingList parques={state} isAdmin={props.isAdmin} />
         </Frame>
       )}
     </>

@@ -14,7 +14,7 @@ export default function Button(props) {
         className="uk-button uk-button-default"
         onClick={props.onClick}
       >
-        {props.btnName}
+        {props.loading ? 'Loading...' : props.btnName}
       </button>
     </>
   );

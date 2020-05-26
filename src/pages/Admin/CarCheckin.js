@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-// import io from 'socket.io-client';
 import Uikit from 'uikit';
 
-import { required } from '../util/validators';
-// import { socketRegistos } from '../util/socket-address';
-import { socketConnectRegistos } from '../util/sockets';
+import { required } from '../../util/validators';
+import {
+  socketConnectRegistos,
+  socketConnectClientes,
+} from '../../util/sockets';
 
-import Navbar from '../components/Navbar/Navbar';
-import Loading from '../components/Loading/Loading';
-import Frame from '../components/Form/Frame/Frame';
-import Input from '../components/Form/Input/Input';
-import Button from '../components/Form/Button/Button';
-import Header from '../components/PageHeaders/Header';
-import Modal from '../components/Modal/Modal';
-import InputIcon from '../components/Form/Input/InputIcon';
+import Navbar from '../../components/Navbar/Navbar';
+import Loading from '../../components/Loading/Loading';
+import Frame from '../../components/Form/Frame/Frame';
+import Input from '../../components/Form/Input/Input';
+import Button from '../../components/Form/Button/Button';
+import Header from '../../components/PageHeaders/Header';
+import Modal from '../../components/Modal/Modal';
+import InputIcon from '../../components/Form/Input/InputIcon';
 
 export default function CarCheckin(props) {
   let history = useHistory();
   const [state, setState] = useState({
     form: {
       Client: {
+        _id: '',
         value: '',
         valid: false,
         validators: [required],
@@ -42,26 +44,21 @@ export default function CarCheckin(props) {
         validators: [required],
       },
     },
-    modal: {
-      title: '',
-      message: '',
-    },
     formIsValid: false,
   });
-  const [stateReset] = useState(state);
   const [loading, setLoading] = useState(true);
 
   const getInitialData = () => {
-    socketConnectRegistos.emit('getAllRegistos');
-    socketConnectRegistos
-      .off('responseGetAllRegistos')
-      .on('responseGetAllRegistos', (data) => {
-        const allRegistos = data.data;
-        console.log(allRegistos);
-        setState((prevState) => {
-          return { ...prevState, allRegistos };
-        });
-      });
+    // socketConnectRegistos.emit('getAllRegistos');
+    // socketConnectRegistos
+    //   .off('responseGetAllRegistos')
+    //   .on('responseGetAllRegistos', (data) => {
+    //     const allRegistos = data.data;
+    //     console.log(allRegistos);
+    //     setState((prevState) => {
+    //       return { ...prevState, allRegistos };
+    //     });
+    //   });
     setLoading(false);
   };
 
@@ -75,34 +72,12 @@ export default function CarCheckin(props) {
           Uikit.modal.alert('Car has been registered!').then(function () {
             history.push('/');
           });
-          // setState((prevState) => {
-          //   return {
-          //     ...stateReset,
-          //     modal: {
-          //       title: 'Success!',
-          //       message: 'Car has been registered!',
-          //     },
-          //   };
-          // });
         } else {
           socketConnectRegistos.close();
           Uikit.modal.alert(`Car hasn't been registered!`).then(function () {
             history.push('/');
           });
-          // setState({
-          //   ...state,
-          //   modal: {
-          //     title: 'Failure!',
-          //     message: `Car hasn't been registered!`,
-          //   },
-          // });
         }
-        // Uikit.modal('#modalSocketResponse')
-        //   .show()
-        //   .then(() => {
-        //     socketConnectRegistos.close();
-        //     // history.push('/');
-        //   });
       });
   };
 
@@ -144,22 +119,72 @@ export default function CarCheckin(props) {
           value: value,
         },
       };
-      // const findResult = prevState.allRegistos.find(
-      //   (registo) => registo.matricula === value
-      // );
-
-      let formIsValid = true;
-      for (const inputName in updatedForm) {
-        formIsValid = formIsValid && updatedForm[inputName].valid;
-      }
-
       return {
         ...state,
         form: updatedForm,
-        formIsValid: formIsValid,
       };
     });
   };
+
+  useEffect(() => {
+    if (state.form.LicensePlate.value.length === 8) {
+      const obj = {
+        matriculas: state.form.LicensePlate.value,
+      };
+      console.log(obj);
+      socketConnectClientes.emit('findClient', obj);
+
+      socketConnectClientes.on('responseFind', (clientData) => {
+        console.log(clientData);
+        if (clientData.data !== null)
+          setState((prevState) => {
+            const updatedForm = prevState.form;
+            updatedForm.Client._id = clientData.data._id;
+            updatedForm.Client.value = clientData.data.nome;
+            updatedForm.Client.valid = true;
+
+            let formIsValid = true;
+            for (const inputName in updatedForm) {
+              formIsValid = formIsValid && updatedForm[inputName].valid;
+            }
+            return {
+              ...prevState,
+              form: { ...updatedForm },
+              formIsValid: formIsValid,
+            };
+          });
+        else
+          setState((prevState) => {
+            const updatedForm = prevState.form;
+            updatedForm.Client.value = 'No client found.';
+            updatedForm.Client.valid = true;
+
+            let formIsValid = true;
+            for (const inputName in updatedForm) {
+              formIsValid = formIsValid && updatedForm[inputName].valid;
+            }
+            return {
+              ...prevState,
+              form: { ...updatedForm },
+              formIsValid: formIsValid,
+            };
+          });
+      });
+    } else if (state.form.LicensePlate.value.length < 8) {
+      setState((prevState) => {
+        const updatedForm = prevState.form;
+        updatedForm.Client._id = '';
+        updatedForm.Client.value = '';
+        updatedForm.Client.valid = false;
+        return {
+          ...prevState,
+          form: { ...updatedForm },
+          formIsValid: false,
+        };
+      });
+    }
+    console.log(state);
+  }, [state.form.LicensePlate.value]);
 
   const inputBlurHandler = (input) => {
     setState((prevState) => {
@@ -178,7 +203,7 @@ export default function CarCheckin(props) {
 
   const handleSubmit = () => {
     const obj = {
-      // cliente: state.form.Register._id,
+      idCliente: state.form.Client._id !== '' ? state.form.Client._id : null,
       matricula: state.form.LicensePlate.value,
       idParque: state.form.Park._id,
       idLugar: state.form.Place._id,
@@ -193,7 +218,7 @@ export default function CarCheckin(props) {
         history.push('/');
       }
       console.log(props.location);
-      
+
       setState((prevState) => {
         return {
           ...prevState,
@@ -214,8 +239,8 @@ export default function CarCheckin(props) {
           },
         };
       });
-      // Apenas registos em que saida == null
       socketConnectRegistos.open();
+      socketConnectClientes.open();
       getInitialData();
       handleSubmitResponse();
     }
@@ -224,23 +249,24 @@ export default function CarCheckin(props) {
       socketConnectRegistos.off('responseGetAllRegistos');
       socketConnectRegistos.off('responseNewRegistos');
       socketConnectRegistos.close();
+      socketConnectClientes.close();
     };
   }, []);
 
   return (
     <>
-      <Modal title={state.modal.title} message={state.modal.message} />
-      <Navbar />
+      <Navbar onLogout={props.onLogout} isAdmin={props.isAdmin} />
       {loading ? (
         <Loading />
       ) : (
         <Frame>
           <Header header="Car checkin" />
           <Input
-            label="Client (optional/ not working)"
+            label="Client"
             id="Client"
             type="text"
-            placeholder="Type the Client name"
+            placeholder=""
+            disabled={true}
             value={state.form.Client.value}
             valid={state.form.Client.valid}
             touched={state.form.Client.touched}
@@ -251,6 +277,7 @@ export default function CarCheckin(props) {
             label="License Plate"
             id="LicensePlate"
             type="text"
+            maxLength="8"
             value={state.form.LicensePlate.value}
             valid={state.form.LicensePlate.valid}
             touched={state.form.LicensePlate.touched}

@@ -27,6 +27,7 @@ export default function InputIcon(props) {
             ].join(' ')}
             type={props.type}
             id={props.id}
+            maxLength={props.maxLength}
             disabled={props.disabled}
             placeholder={props.placeholder}
             value={props.value}
