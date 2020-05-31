@@ -32,7 +32,11 @@ export default function Lugar(props) {
                 pathname: '/car-checkin',
                 state: {
                   parque: { idParque: props.idParque, nome: props.nomeParque },
-                  lugar: { idLugar: props.idLugar, label: props.label },
+                  lugar: {
+                    idLugar: props.idLugar,
+                    label: props.label,
+                    mobilidadeReduzida: props.mobilidadeReduzida,
+                  },
                 },
               }
             : {
@@ -52,7 +56,9 @@ export default function Lugar(props) {
             <span className="lugarState ocupado">Occupied</span>
           )}
           {props.mobilidadeReduzida === true && (
-            <span className="iconMobilidadeReduzida"><img src={wheelchairSVG} alt="" srcset=""/></span>
+            <span className="iconMobilidadeReduzida">
+              <img src={wheelchairSVG}/>
+            </span>
           )}
         </span>
       </Link>

@@ -95,6 +95,24 @@ export default function Clients(props) {
     });
   };
 
+  const handleResponseDelete = () => {
+    socketConnectClientes.off('responseDelete').on('responseDelete', (data) => {
+      console.log('got it ', data);
+      if (data.status === 200) {
+        Uikit.modal.alert(`Client was deleted!`).then(function () {
+          history.push('/');
+        });
+      } else {
+        socketConnectClientes.close();
+        Uikit.modal.alert(`Client was not deleted!`).then(function () {
+          history.push('/');
+        });
+      }
+      // Uikit.modal('#modalSocketResponse').show();
+      console.log(state);
+    });
+  };
+
   const inputChangeHandler = (input, value) => {
     setState((prevState) => {
       let isValid = true;
@@ -182,6 +200,14 @@ export default function Clients(props) {
     };
     socketConnectClientes.emit('updateCliente', obj);
   };
+
+  const handleSubmitDeleteClient = () => {
+    setWaitResponse(true);
+    const obj = {
+      _id: state.form._id.value,
+    };
+    socketConnectClientes.emit('deleteClient', obj);
+  };
   useEffect(() => {
     let isMounted = true;
     if (isMounted) {
@@ -189,6 +215,7 @@ export default function Clients(props) {
       getInitialData();
       handleResponseFindByName();
       handleResponseUpdateByName();
+      handleResponseDelete();
     }
     return () => {
       socketConnectClientes.close();
@@ -258,6 +285,14 @@ export default function Clients(props) {
             }
             disabled={!state.formIsValid || waitResponse}
           />
+          {state.form.LicensePlate.value !== '' &&
+          state.form.Charge.value !== '' ? (
+            <Button
+              btnName="DELETE"
+              onClick={handleSubmitDeleteClient}
+              disabled={!state.formIsValid || waitResponse}
+            />
+          ) : null}
         </Frame>
       )}
     </>

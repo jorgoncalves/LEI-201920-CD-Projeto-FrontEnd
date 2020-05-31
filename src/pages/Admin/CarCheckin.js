@@ -234,6 +234,7 @@ export default function CarCheckin(props) {
               ...prevState.Place,
               _id: props.location.state.lugar.idLugar,
               value: props.location.state.lugar.label,
+              mobilidadeReduzida: props.location.state.lugar.mobilidadeReduzida,
               valid: true,
             },
           },
@@ -268,10 +269,6 @@ export default function CarCheckin(props) {
             placeholder=""
             disabled={true}
             value={state.form.Client.value}
-            valid={state.form.Client.valid}
-            touched={state.form.Client.touched}
-            onChange={inputChangeHandler}
-            onBlur={inputBlurHandler.bind(this, 'Client')}
           />
           <InputIcon
             label="License Plate"
@@ -292,21 +289,15 @@ export default function CarCheckin(props) {
             type="text"
             disabled={true}
             value={state.form.Park.value}
-            valid={state.form.Park.valid}
-            touched={state.form.Park.touched}
-            onChange={inputChangeHandler}
-            onBlur={inputBlurHandler.bind(this, 'Park')}
           />
-          <Input
+          <InputIcon
             label="Place"
             id="Place"
             type="text"
             disabled={true}
             value={state.form.Place.value}
-            valid={state.form.Place.valid}
-            touched={state.form.Place.touched}
-            onChange={inputChangeHandler}
-            onBlur={inputBlurHandler.bind(this, 'Place')}
+            mobilidadeReduzida={state.form.Place.mobilidadeReduzida}
+            icon="wheelchair"
           />
           <Button
             btnName="Send"

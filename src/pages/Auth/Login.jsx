@@ -115,7 +115,7 @@ export default function Home(props) {
             <Input
               label="Password"
               id="Password"
-              type="text"
+              type="password"
               value={state.form.Password.value}
               onChange={inputChangeHandler}
               onBlur={inputBlurHandler.bind(this, 'Password')}

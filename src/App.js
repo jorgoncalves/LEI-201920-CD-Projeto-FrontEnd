@@ -15,7 +15,7 @@ import CarCheckin from './pages/Admin/CarCheckin';
 import CarCheckout from './pages/Admin/CarCheckout';
 import Client from './pages/Client/Client';
 import ClientsAdmin from './pages/Admin/ClientsAdmin';
-import Park from './pages/Park';
+import Park from './pages/Admin/Park';
 import ClientHistory from './pages/Client/ClientHistory';
 
 export default withRouter(function App() {
@@ -327,6 +327,7 @@ export default withRouter(function App() {
   }
   return (
     <Switch>
+      {console.log(state)}
       {routes}
       <Redirect to="/" />
     </Switch>

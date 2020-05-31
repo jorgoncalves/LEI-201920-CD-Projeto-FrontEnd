@@ -50,7 +50,9 @@ export default function Clients(props) {
           updatedForm.Name.valid = true;
           updatedForm.LicensePlate.value = clientData.matriculas;
           updatedForm.LicensePlate.valid = true;
-          updatedForm.Charge.value = `${clientData.saldoEmCartao.toFixed(2).toString()}€`;
+          updatedForm.Charge.value = `${clientData.saldoEmCartao
+            .toFixed(2)
+            .toString()}`;
           updatedForm.Charge.valid = true;
           return { ...prevState, form: updatedForm };
         });
@@ -178,7 +180,7 @@ export default function Clients(props) {
             type="text"
             min="0"
             disabled={true}
-            value={state.form.Charge.value}
+            value={`${state.form.Charge.value}€`}
             valid={state.form.Charge.valid}
             touched={state.form.Charge.touched}
             onChange={inputChangeHandler}

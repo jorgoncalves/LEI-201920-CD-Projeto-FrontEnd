@@ -2,10 +2,9 @@ import React from 'react';
 
 import './InputIcon.css';
 
+import wheelchairSVG from '../../../img/Wheelchair_symbol.svg';
+
 export default function InputIcon(props) {
-
-
-
   return (
     <>
       <div className="uk-margin">
@@ -13,12 +12,18 @@ export default function InputIcon(props) {
           {props.label}
         </label>
         <div className="uk-inline">
-          <a
-            className="uk-form-icon uk-form-icon-flip"
-            href="#"
-            uk-icon={`icon: ${props.icon}`}
-            onClick={props.generateLicensePlate}
-          ></a>
+          {props.mobilidadeReduzida ? (
+            <span className="uk-form-icon uk-form-icon-flip">
+              <img src={wheelchairSVG} alt="" srcset="" />
+            </span>
+          ) : (
+            <a
+              className="uk-form-icon uk-form-icon-flip"
+              href="#"
+              uk-icon={`icon: ${props.icon}`}
+              onClick={props.generateLicensePlate}
+            ></a>
+          )}
           <input
             className={[
               !props.valid ? `invalid` : `valid`,

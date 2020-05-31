@@ -59,10 +59,6 @@ export default function CarCheckout(props) {
         validators: [required],
       },
     },
-    modal: {
-      title: '',
-      message: '',
-    },
     formIsValid: false,
   });
 
@@ -151,26 +147,24 @@ export default function CarCheckout(props) {
           value: value,
         },
       };
-      const findResult = prevState.allRegistos.find(
-        (registo) => registo.matricula === value
-      );
 
-      if (findResult) {
-        const hora_entrada = moment(findResult.hora_entrada);
+      const registerData = prevState.registerData;
+      if (registerData) {
+        const hora_entrada = moment(registerData.hora_entrada);
         const hora_saida = moment();
 
         const valor =
           moment.duration(hora_saida.diff(hora_entrada)).hours() === 0
-            ? findResult.parque.precoPorHora
+            ? registerData.parque.precoPorHora
             : moment.duration(hora_saida.diff(hora_entrada)).hours() *
-              findResult.parque.precoPorHora;
+            registerData.parque.precoPorHora;
 
-        updatedForm.Register._id = findResult._id;
-        updatedForm.Park._id = findResult.parque._id;
-        updatedForm.Park.value = findResult.parque.nome;
+        updatedForm.Register._id = registerData._id;
+        updatedForm.Park._id = registerData.parque._id;
+        updatedForm.Park.value = registerData.parque.nome;
         updatedForm.Park.valid = true;
-        updatedForm.Place._id = findResult.lugar._id;
-        updatedForm.Place.value = findResult.lugar.label;
+        updatedForm.Place._id = registerData.lugar._id;
+        updatedForm.Place.value = registerData.lugar.label;
         updatedForm.Place.valid = true;
         updatedForm.TotalPrice.value = valor;
         updatedForm.TotalPrice.valid = true;
@@ -230,7 +224,6 @@ export default function CarCheckout(props) {
 
   return (
     <>
-      <Modal title={state.modal.title} message={state.modal.message} />
       <Navbar onLogout={props.onLogout} isAdmin={props.isAdmin} />
       {loading ? (
         <Loading />

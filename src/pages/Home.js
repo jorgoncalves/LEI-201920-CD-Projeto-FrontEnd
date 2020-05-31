@@ -15,7 +15,7 @@ export default function Home(props) {
   const [isAdmin, setIsAdmin] = useState(props.isAdmin);
 
   const getInitialData = () => {
-    socketConnectParques.emit('getAllParques');
+    socketConnectParques.emit('getAllParques', { token: props.token });
     socketConnectParques
       .off('responseGetAllParque')
       .on('responseGetAllParque', (data) => {
