@@ -39,6 +39,7 @@ export default function Home(props) {
       isMounted = false;
     };
   }, []);
+  
   useEffect(() => {
     setIsAdmin(props.isAdmin);
   }, [props.isAdmin]);
