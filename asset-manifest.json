@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/static/css/main.99e8a3a6.chunk.css",
-    "main.js": "/static/js/main.8d0fe221.chunk.js",
-    "main.js.map": "/static/js/main.8d0fe221.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.76b4324f.js",
-    "runtime-main.js.map": "/static/js/runtime-main.76b4324f.js.map",
-    "static/js/2.ca10ec6b.chunk.js": "/static/js/2.ca10ec6b.chunk.js",
-    "static/js/2.ca10ec6b.chunk.js.map": "/static/js/2.ca10ec6b.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.ca24c6f65b374bbd44eda382a2717c2c.js": "/precache-manifest.ca24c6f65b374bbd44eda382a2717c2c.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/main.99e8a3a6.chunk.css.map": "/static/css/main.99e8a3a6.chunk.css.map",
-    "static/js/2.ca10ec6b.chunk.js.LICENSE.txt": "/static/js/2.ca10ec6b.chunk.js.LICENSE.txt",
-    "static/media/Wheelchair_symbol.svg": "/static/media/Wheelchair_symbol.71fb5891.svg"
+    "main.css": "/LEI-201920-CD-Projeto-FrontEnd/static/css/main.99e8a3a6.chunk.css",
+    "main.js": "/LEI-201920-CD-Projeto-FrontEnd/static/js/main.8d0fe221.chunk.js",
+    "main.js.map": "/LEI-201920-CD-Projeto-FrontEnd/static/js/main.8d0fe221.chunk.js.map",
+    "runtime-main.js": "/LEI-201920-CD-Projeto-FrontEnd/static/js/runtime-main.dda2eab3.js",
+    "runtime-main.js.map": "/LEI-201920-CD-Projeto-FrontEnd/static/js/runtime-main.dda2eab3.js.map",
+    "static/js/2.64879f86.chunk.js": "/LEI-201920-CD-Projeto-FrontEnd/static/js/2.64879f86.chunk.js",
+    "static/js/2.64879f86.chunk.js.map": "/LEI-201920-CD-Projeto-FrontEnd/static/js/2.64879f86.chunk.js.map",
+    "index.html": "/LEI-201920-CD-Projeto-FrontEnd/index.html",
+    "precache-manifest.68616f5538bca37ea3cbee089d47525d.js": "/LEI-201920-CD-Projeto-FrontEnd/precache-manifest.68616f5538bca37ea3cbee089d47525d.js",
+    "service-worker.js": "/LEI-201920-CD-Projeto-FrontEnd/service-worker.js",
+    "static/css/main.99e8a3a6.chunk.css.map": "/LEI-201920-CD-Projeto-FrontEnd/static/css/main.99e8a3a6.chunk.css.map",
+    "static/js/2.64879f86.chunk.js.LICENSE.txt": "/LEI-201920-CD-Projeto-FrontEnd/static/js/2.64879f86.chunk.js.LICENSE.txt",
+    "static/media/Wheelchair_symbol.svg": "/LEI-201920-CD-Projeto-FrontEnd/static/media/Wheelchair_symbol.71fb5891.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.76b4324f.js",
-    "static/js/2.ca10ec6b.chunk.js",
+    "static/js/runtime-main.dda2eab3.js",
+    "static/js/2.64879f86.chunk.js",
     "static/css/main.99e8a3a6.chunk.css",
     "static/js/main.8d0fe221.chunk.js"
   ]
