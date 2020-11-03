@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/LEI-201920-CD-Projeto-FrontEnd/precache-manifest.68616f5538bca37ea3cbee089d47525d.js"
+  "/LEI-201920-CD-Projeto-FrontEnd/precache-manifest.f95adf471c8dc02e7eb44654acff33b1.js"
 );
 
 self.addEventListener('message', (event) => {
